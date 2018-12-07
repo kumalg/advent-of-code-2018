@@ -162,13 +162,13 @@ namespace AdventOfCode2018.Days {
             var maxX = selectedCoordinates.OrderByDescending(x => x.Position.X).First().Position.X;
             var maxY = selectedCoordinates.OrderByDescending(x => x.Position.Y).First().Position.Y;
 
-            return Enumerable.Range(0, maxX + 2)
+            return Enumerable
+                .Range(0, maxX + 2)
                 .Select(x => Enumerable.Range(0, maxY + 2)
                 .Select(y => (X: x, Y: y)))
                 .SelectMany(x => x)
                 .Select(x => selectedCoordinates.Sum(c => Math.Abs(c.Position.X - x.X) + Math.Abs(c.Position.Y - x.Y)))
-                .Where(x => x < 10000)
-                .Count();
+                .Count(x => x < 10000);
         }
     }
 }
