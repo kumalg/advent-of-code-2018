@@ -90,14 +90,13 @@ using System.Threading.Tasks;
 
 namespace AdventOfCode2018.Days {
     public class Day07 {
-        private static char _emptyChar = (char)0;
         private static int _countOffset = 'A' - 1;
 
         public static async Task Solve() {
             Console.WriteLine("Day 7");
 
             var steps = (await File.ReadAllLinesAsync("../../../Inputs/day_07.txt"))
-                .Select(x => Regex.Match(x, @"Step (?<from>.*) must be finished before step (?<to>.*) can begin.").Groups.Skip(1).Select(y => y.Value[0]))
+                .Select(x => Regex.Match(x, @"Step (?<from>.*) must be finished before step (?<to>.*) can begin.").Groups.Skip(1).Select(y => y.Value[0]).ToList())
                 .Select(x => (x.ElementAt(0), x.ElementAt(1)))
                 .ToList();
 
@@ -152,7 +151,7 @@ namespace AdventOfCode2018.Days {
 
             while (done.Count < count) {
                 workers = workers.Select(x => (x.Step, x.Seconds + 1)).ToList();
-                var finished = workers.Where(x => x.Seconds >= x.Step - _countOffset + secondsBase);
+                var finished = workers.Where(x => x.Seconds >= x.Step - _countOffset + secondsBase).ToList();
                 done.AddRange(finished.Select(x => x.Step));
                 workers = workers.Except(finished).ToList();
 
