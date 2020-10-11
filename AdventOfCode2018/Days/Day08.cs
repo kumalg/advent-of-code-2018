@@ -62,6 +62,7 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -71,7 +72,7 @@ namespace AdventOfCode2018.Days {
         public static async Task Solve() {
             Console.WriteLine("Day 8");
 
-            var numbers = (await File.ReadAllTextAsync("../../../Inputs/day_08.txt"))
+            var numbers = (await File.ReadAllTextAsync("../../../Inputs/day_08_example.txt"))
                 .Replace("\n", "")
                 .Split()
                 .Select(int.Parse)
@@ -90,20 +91,26 @@ namespace AdventOfCode2018.Days {
             var node = new Node {
                 Index = index,
                 NodeCount = numbers[index],
-                MetadataCount = numbers[++index]
+                MetadataCount = numbers[++index],
+                Nodes = Enumerable.Range(++index, numbers[index - 1])
+                    .Aggregate(new Node[] { }.ToImmutableList(),
+                        (a, b) => a.Add(FindNode(numbers, a.LastOrDefault()?.LastIndex + 1 ?? b, sum).Node)).ToList()
             };
-            ++index;
 
-            for (var i = 0; i < node.NodeCount; i++) {
-                var foundNode = FindNode(numbers, index, sum);
-                index = foundNode.NextIndex;
-                sum = foundNode.Sum;
-                node.Nodes.Add(foundNode.Node);
-            }
+            //for (var i = 0; i < node.NodeCount; i++) {
+            //    var foundNode = FindNode(numbers, index, sum);
+            //    index = foundNode.NextIndex;
+            //    sum = foundNode.Sum;
+            //    node.Nodes.Add(foundNode.Node);
+            //}
+
+            //var nodes = Enumerable.Range(tempIndex, node.NodeCount)
+            //    .Aggregate(new Node[] { }.ToImmutableList(),
+            //        (a, b) => a.Add(FindNode(numbers, a.LastOrDefault()?.LastIndex + 1 ?? b, sum).Node));
 
             sum += numbers.Skip(index).Take(node.MetadataCount).Sum();
 
-            index += node.MetadataCount;
+            index = node.MetadataCount + 1 + node.Nodes.LastOrDefault()?.LastIndex ?? 0;
             node.LastIndex = index - 1;
             return (node, index, sum);
         }
